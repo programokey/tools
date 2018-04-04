@@ -74,6 +74,7 @@ func monitorTask(endpoint string) {
 	var waitForEventTimeout = 5 * time.Second
 
 	var httpClient = getHTTPClient(endpoint)
+	httpClient.Start()
 
 	evtTyp := types.EventNewBlockHeader
 	evt, err := client.WaitForOneEvent(httpClient, evtTyp, waitForEventTimeout)
