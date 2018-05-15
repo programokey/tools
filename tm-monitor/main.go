@@ -8,7 +8,8 @@ import (
 
 	cmn "github.com/tendermint/tmlibs/common"
 	"github.com/tendermint/tmlibs/log"
-	monitor "github.com/tendermint/tools/tm-monitor/monitor"
+	monitor "github.com/kidinamoto01/tools/tm-monitor/monitor"
+	"strconv"
 )
 
 var version = "0.4.0"
@@ -45,6 +46,16 @@ Examples:
 		flag.Usage()
 		os.Exit(1)
 	}
+
+	//第二个参数为no-ton
+	b, err := strconv.ParseBool(flag.Arg(1))
+	if err != nil{
+
+	}else{
+		fmt.Println("non-ton",flag.Arg(1))
+	}
+
+	noton = b
 
 	if noton {
 		logger = log.NewTMLogger(log.NewSyncWriter(os.Stdout))
