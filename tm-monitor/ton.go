@@ -74,10 +74,19 @@ func (o *Ton) printHeader() {
 
 func (o *Ton) printTable() {
 	w := tabwriter.NewWriter(o.Output, 0, 0, 5, ' ', 0)
-	fmt.Fprintln(w, "NAME\tHEIGHT\tBLOCK LATENCY\tONLINE\tVALIDATOR\tPOWER\tSum\t")
-	for _, n := range o.monitor.Nodes {
-		fmt.Fprintln(w, fmt.Sprintf("%s\t%d\t%.3f ms\t%v\t%v\t%d\t%d\t", n.Name, n.Height, n.BlockLatency, n.Online, n.IsValidator,n.Power,n.Power))
+	nw := o.monitor.Network
+	if nw.PowerSum > 0{
+		fmt.Fprintln(w, "NAME\tHEIGHT\tBLOCK LATENCY\tONLINE\tVALIDATOR\tPOWER\tRatio %\t")
+		for _, n := range o.monitor.Nodes {
+			fmt.Fprintln(w, fmt.Sprintf("%s\t%d\t%.3f ms\t%v\t%v\t%d\t%d\t", n.Name, n.Height, n.BlockLatency, n.Online, n.IsValidator,n.Power,n.Power*100/nw.PowerSum))
+		}
+	}else{
+		fmt.Fprintln(w, "NAME\tHEIGHT\tBLOCK LATENCY\tONLINE\tVALIDATOR\tPOWER\tRatio\t")
+		for _, n := range o.monitor.Nodes {
+			fmt.Fprintln(w, fmt.Sprintf("%s\t%d\t%.3f ms\t%v\t%v\t%d\t%d\t", n.Name, n.Height, n.BlockLatency, n.Online, n.IsValidator,n.Power,0))
+		}
 	}
+
 	w.Flush()
 }
 
