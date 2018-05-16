@@ -27,6 +27,7 @@ type Node struct {
 	pubKey      crypto.PubKey `json:"pub_key"`
 
 	PrecommitSum int `json:"pc_sum"`
+	PrecommitMiss int `json:"pc_miss"`
 
 	Name         string  `json:"name"`
 	Online       bool    `json:"online"`
@@ -166,14 +167,18 @@ func newFullBlockCallback(n *Node) em.EventCallbackFunc {
 		n.logger.Info("new block", "height", block.Height, "hash", block.LastCommit.Hash())
 
 		pc := block.LastCommit.Precommits
+		voteNil := true
 		for _,commit:=range pc {
 			if pc != nil && commit != nil {
 				if n.pubKey.Address().String()==commit.ValidatorAddress.String() {
 					n.PrecommitSum ++
+					voteNil = false
 				}
 			}
+		}
 
-
+		if voteNil {
+			n.PrecommitMiss ++
 		}
 		if n.fullblockCh != nil {
 			n.fullblockCh <- *block
