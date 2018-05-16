@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 
-	metrics "github.com/rcrowley/go-metrics"
+	"github.com/rcrowley/go-metrics"
 	tmtypes "github.com/tendermint/tendermint/types"
 )
 
@@ -46,6 +46,7 @@ type Network struct {
 	NumNodesMonitored       int `json:"num_nodes_monitored"`
 	NumNodesMonitoredOnline int `json:"num_nodes_monitored_online"`
 
+	PowerSum    int64		`json:"power_sum"`
 	Health Health `json:"health"`
 
 	UptimeData *UptimeData `json:"uptime_data"`
@@ -197,3 +198,33 @@ func (n *Network) Uptime() float64 {
 func (n *Network) StartTime() time.Time {
 	return n.UptimeData.StartTime
 }
+
+////get client
+//func getHTTPClient(url string) *client.HTTP {
+//	//"116.62.62.39:46657"
+//	rpcAddr := url
+//	return client.NewHTTP(rpcAddr, "/websocket")
+//}
+//
+////get total bonded steaks
+//func getTotalSteaks(h int64,c client.Client) int64{
+//	sum := int64(0)
+//
+//	vs,e := c.Validators(&h)
+//	if e != nil{
+//
+//	}else{
+//		for _,v := range vs.Validators{
+//			sum+=v.VotingPower
+//		}
+//	}
+//
+//	return sum
+//}
+//
+func (n *Network) UpdateTotalBondForHeight(sum  int64) {
+	n.mu.Lock()
+	defer n.mu.Unlock()
+	n.PowerSum =sum
+}
+

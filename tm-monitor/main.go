@@ -8,8 +8,7 @@ import (
 
 	cmn "github.com/tendermint/tmlibs/common"
 	"github.com/tendermint/tmlibs/log"
-	monitor "github.com/kidinamoto01/tools/tm-monitor/monitor"
-	"strconv"
+	"github.com/kidinamoto01/tools/tm-monitor/monitor"
 )
 
 var version = "0.4.0"
@@ -47,15 +46,15 @@ Examples:
 		os.Exit(1)
 	}
 
-	//第二个参数为no-ton
-	b, err := strconv.ParseBool(flag.Arg(1))
-	if err != nil{
-
-	}else{
-		fmt.Println("non-ton",flag.Arg(1))
-	}
-
-	noton = b
+	////第二个参数为no-ton
+	//b, err := strconv.ParseBool(flag.Arg(1))
+	//if err != nil{
+	//
+	//}else{
+	//	fmt.Println("non-ton",flag.Arg(1))
+	//}
+	//
+	//noton = b
 
 	if noton {
 		logger = log.NewTMLogger(log.NewSyncWriter(os.Stdout))
@@ -87,7 +86,9 @@ func startMonitor(endpoints string) *monitor.Monitor {
 		n := monitor.NewNode(e)
 		n.SetLogger(logger.With("node", e))
 		if err := m.Monitor(n); err != nil {
-			panic(err)
+			//panic(err)
+			//如果无法连接，不要panic
+			fmt.Errorf("err connect to ",endpoints)
 		}
 	}
 

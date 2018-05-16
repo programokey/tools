@@ -6,13 +6,14 @@ import (
 	"os"
 	"text/tabwriter"
 	"time"
-
 	monitor "github.com/kidinamoto01/tools/tm-monitor/monitor"
 )
 
 const (
 	// Default refresh rate - 200ms
 	defaultRefreshRate = time.Millisecond * 200
+	totalSteaks = 1800
+
 )
 
 // Ton - table of nodes.
@@ -62,7 +63,8 @@ func (o *Ton) Stop() {
 func (o *Ton) printHeader() {
 	n := o.monitor.Network
 	fmt.Fprintf(o.Output, "%v up %.2f%%\n", n.StartTime(), n.Uptime())
-	fmt.Println()
+	fmt.Println("Total steaks in genesis:",totalSteaks)
+	fmt.Println("Total steaks bonded:",n.PowerSum)
 	fmt.Fprintf(o.Output, "Height: %d\n", n.Height)
 	fmt.Fprintf(o.Output, "Avg block time: %.3f ms\n", n.AvgBlockTime)
 	fmt.Fprintf(o.Output, "Avg tx throughput: %.0f per sec\n", n.AvgTxThroughput)
@@ -72,9 +74,9 @@ func (o *Ton) printHeader() {
 
 func (o *Ton) printTable() {
 	w := tabwriter.NewWriter(o.Output, 0, 0, 5, ' ', 0)
-	fmt.Fprintln(w, "NAME\tHEIGHT\tBLOCK LATENCY\tONLINE\tVALIDATOR\t")
+	fmt.Fprintln(w, "NAME\tHEIGHT\tBLOCK LATENCY\tONLINE\tVALIDATOR\tPOWER\tSum\t")
 	for _, n := range o.monitor.Nodes {
-		fmt.Fprintln(w, fmt.Sprintf("%s\t%d\t%.3f ms\t%v\t%v\t", n.Name, n.Height, n.BlockLatency, n.Online, n.IsValidator))
+		fmt.Fprintln(w, fmt.Sprintf("%s\t%d\t%.3f ms\t%v\t%v\t%d\t%d\t", n.Name, n.Height, n.BlockLatency, n.Online, n.IsValidator,n.Power,n.Power))
 	}
 	w.Flush()
 }

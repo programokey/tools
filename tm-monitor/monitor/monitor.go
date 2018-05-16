@@ -215,7 +215,9 @@ func (m *Monitor) updateNumValidatorLoop() {
 			i := 0
 
 			m.mtx.Lock()
+			//m.Network.PowerSum = 0
 			for _, n := range m.Nodes {
+
 				if i == randomNodeIndex {
 					height, num, err = n.NumValidators()
 					if err != nil {
@@ -228,6 +230,37 @@ func (m *Monitor) updateNumValidatorLoop() {
 			m.mtx.Unlock()
 
 			m.Network.UpdateNumValidatorsForHeight(num, height)
+			m.Network.UpdateTotalBondForHeight(m.Nodes[0].GetTotalSteaks())
 		}
 	}
 }
+
+
+////计算validator总权重
+//func (m *Monitor) getAllValidatorPowers() {
+//	sum := int64(0)
+//	_, validators, err := m.Network.validators()
+//	if err == nil {
+//		for _, v := range n.{
+//			sum += v.VotingPower
+//		}
+//	} else {
+//		n.logger.Info("get all validator powers failed", "err", err)
+//	}
+//
+//	n.PowerSum = sum
+//
+//}
+//
+//
+//
+//func (m *Monitor) updateSumValidatorPowerLoop() {
+//		for {
+//			select {
+//			case <-m.quit:
+//				return
+//			case <-time.After(m.checkIsValidatorInterval):
+//				n.getAllValidatorPowers()
+//			}
+//		}
+//	}

@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	crypto "github.com/tendermint/go-crypto"
+	"github.com/tendermint/go-crypto"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 	rpc_client "github.com/tendermint/tendermint/rpc/lib/client"
 	tmtypes "github.com/tendermint/tendermint/types"
@@ -21,6 +21,9 @@ type Node struct {
 	rpcAddr string
 
 	IsValidator bool          `json:"is_validator"` // validator or non-validator?
+
+	Power    int64		`json:"power"`
+	PowerRatio  int       `json:"power_ratio"`
 	pubKey      crypto.PubKey `json:"pub_key"`
 
 	Name         string  `json:"name"`
@@ -113,6 +116,9 @@ func (n *Node) Start() error {
 	n.checkIsValidator()
 	go n.checkIsValidatorLoop()
 
+	//n.getAllValidatorPowers()
+	//go n.checkSumValidatorPowerLoop()
+
 	return nil
 }
 
@@ -200,6 +206,15 @@ func (n *Node) validators() (height int64, validators []*tmtypes.Validator, err 
 	return vals.BlockHeight, vals.Validators, nil
 }
 
+//统计每一个块中的precommit
+func (n *Node) precommits() (height int64, validators []*tmtypes.Validator, err error) {
+	vals := new(ctypes.ResultValidators)
+	if _, err = n.rpcClient.Call("validators", nil, vals); err != nil {
+		return 0, make([]*tmtypes.Validator, 0), err
+	}
+	return vals.BlockHeight, vals.Validators, nil
+}
+
 func (n *Node) checkIsValidatorLoop() {
 	for {
 		select {
@@ -219,12 +234,16 @@ func (n *Node) checkIsValidator() {
 			// TODO: use bytes.Equal
 			if err1 == nil && v.PubKey == key {
 				n.IsValidator = true
+				n.Power = v.VotingPower
 			}
 		}
 	} else {
 		n.logger.Info("check is validator failed", "err", err)
 	}
 }
+
+
+
 
 func (n *Node) getPubKey() (crypto.PubKey, error) {
 	if n.pubKey != nil {
@@ -257,4 +276,24 @@ func UnmarshalEvent(b json.RawMessage) (string, events.EventData, error) {
 		return "", nil, err
 	}
 	return event.Query, event.Data, nil
+}
+
+
+
+////get total bonded steaks
+func (n *Node) GetTotalSteaks() int64{
+	sum := int64(0)
+	_,vs,err:= n.validators()
+
+	if err != nil {
+		return 0
+	}
+
+	for _,v := range vs{
+
+		sum+=v.VotingPower
+
+		}
+
+	return sum
 }
