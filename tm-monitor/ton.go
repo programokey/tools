@@ -65,6 +65,8 @@ func (o *Ton) printHeader() {
 	fmt.Fprintf(o.Output, "%v up %.2f%%\n", n.StartTime(), n.Uptime())
 	fmt.Println("Total steaks in genesis:",totalSteaks)
 	fmt.Println("Total steaks bonded:",n.PowerSum)
+	//ratio :=int(n.PowerSum)*100/totalSteaks
+	fmt.Println("Bonded Percentage: ",(n.PowerSum)*100/totalSteaks,"% ")
 	fmt.Fprintf(o.Output, "Height: %d\n", n.Height)
 	fmt.Fprintf(o.Output, "Avg block time: %.3f ms\n", n.AvgBlockTime)
 	fmt.Fprintf(o.Output, "Avg tx throughput: %.0f per sec\n", n.AvgTxThroughput)
