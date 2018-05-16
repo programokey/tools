@@ -26,6 +26,8 @@ type Node struct {
 	PowerRatio  int       `json:"power_ratio"`
 	pubKey      crypto.PubKey `json:"pub_key"`
 
+	PrecommitSum int `json:"pc_sum"`
+
 	Name         string  `json:"name"`
 	Online       bool    `json:"online"`
 	Height       int64   `json:"height"`
@@ -38,6 +40,8 @@ type Node struct {
 	rpcClient rpc_client.HTTPClient
 
 	blockCh        chan<- tmtypes.Header
+	//收到的完整区块
+	fullblockCh        chan<- tmtypes.Block
 	blockLatencyCh chan<- float64
 	disconnectCh   chan<- bool
 
@@ -81,6 +85,11 @@ func SetCheckIsValidatorInterval(d time.Duration) func(n *Node) {
 	}
 }
 
+//添加fullblock传送
+func (n *Node) SendFullBlocksTo(ch chan<- tmtypes.Block) {
+	n.fullblockCh = ch
+}
+
 func (n *Node) SendBlocksTo(ch chan<- tmtypes.Header) {
 	n.blockCh = ch
 }
@@ -105,7 +114,13 @@ func (n *Node) Start() error {
 	}
 
 	n.em.RegisterLatencyCallback(latencyCallback(n))
+	//添加full block的callback
 	err := n.em.Subscribe(tmtypes.EventQueryNewBlockHeader.String(), newBlockCallback(n))
+	if err != nil {
+		return err
+	}
+	//添加callback
+	err = n.em.Subscribe(tmtypes.EventQueryNewBlock.String(), newFullBlockCallback(n))
 	if err != nil {
 		return err
 	}
@@ -115,9 +130,6 @@ func (n *Node) Start() error {
 
 	n.checkIsValidator()
 	go n.checkIsValidatorLoop()
-
-	//n.getAllValidatorPowers()
-	//go n.checkSumValidatorPowerLoop()
 
 	return nil
 }
@@ -140,6 +152,31 @@ func newBlockCallback(n *Node) em.EventCallbackFunc {
 
 		if n.blockCh != nil {
 			n.blockCh <- *block
+		}
+	}
+}
+
+// implements eventmeter.EventCallbackFunc
+func newFullBlockCallback(n *Node) em.EventCallbackFunc {
+	return func(metric *em.EventMetric, data interface{}) {
+		block := data.(tmtypes.TMEventData).(tmtypes.EventDataNewBlock).Block
+
+		n.Height = block.Height
+
+		n.logger.Info("new block", "height", block.Height, "hash", block.LastCommit.Hash())
+
+		pc := block.LastCommit.Precommits
+		for _,commit:=range pc {
+			if pc != nil && commit != nil {
+				if n.pubKey.Address().String()==commit.ValidatorAddress.String() {
+					n.PrecommitSum ++
+				}
+			}
+
+
+		}
+		if n.fullblockCh != nil {
+			n.fullblockCh <- *block
 		}
 	}
 }

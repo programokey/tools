@@ -90,6 +90,27 @@ func (n *Network) NewBlock(b tmtypes.Header) {
 	n.AvgTxThroughput = n.txThroughputMeter.Rate1()
 }
 
+
+func (n *Network) NewFullBlock(b tmtypes.Block) {
+	n.mu.Lock()
+	defer n.mu.Unlock()
+
+	if n.Height >= b.Height {
+		return
+	}
+
+	//n.Height = b.Height
+
+
+
+	//round := b.LastCommit.Round()
+
+	//pc := b.LastCommit.Precommits
+
+
+}
+
+
 func (n *Network) NewBlockLatency(l float64) {
 	n.mu.Lock()
 	defer n.mu.Unlock()

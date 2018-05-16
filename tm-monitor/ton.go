@@ -78,14 +78,14 @@ func (o *Ton) printTable() {
 	w := tabwriter.NewWriter(o.Output, 0, 0, 5, ' ', 0)
 	nw := o.monitor.Network
 	if nw.PowerSum > 0{
-		fmt.Fprintln(w, "NAME\tHEIGHT\tBLOCK LATENCY\tONLINE\tVALIDATOR\tPOWER\tRatio %\t")
+		fmt.Fprintln(w, "NAME\tHEIGHT\tBLOCK LATENCY\tONLINE\tVALIDATOR\tPOWER\tRatio %\tPrecommit_Sum\t")
 		for _, n := range o.monitor.Nodes {
-			fmt.Fprintln(w, fmt.Sprintf("%s\t%d\t%.3f ms\t%v\t%v\t%d\t%d\t", n.Name, n.Height, n.BlockLatency, n.Online, n.IsValidator,n.Power,n.Power*100/nw.PowerSum))
+			fmt.Fprintln(w, fmt.Sprintf("%s\t%d\t%.3f ms\t%v\t%v\t%d\t%d\t%d\t", n.Name, n.Height, n.BlockLatency, n.Online, n.IsValidator,n.Power,n.Power*100/nw.PowerSum,n.PrecommitSum))
 		}
 	}else{
-		fmt.Fprintln(w, "NAME\tHEIGHT\tBLOCK LATENCY\tONLINE\tVALIDATOR\tPOWER\tRatio\t")
+		fmt.Fprintln(w, "NAME\tHEIGHT\tBLOCK LATENCY\tONLINE\tVALIDATOR\tPOWER\tRatio\tPrecommit_Sum\t")
 		for _, n := range o.monitor.Nodes {
-			fmt.Fprintln(w, fmt.Sprintf("%s\t%d\t%.3f ms\t%v\t%v\t%d\t%d\t", n.Name, n.Height, n.BlockLatency, n.Online, n.IsValidator,n.Power,0))
+			fmt.Fprintln(w, fmt.Sprintf("%s\t%d\t%.3f ms\t%v\t%v\t%d\t%d\t%d\t", n.Name, n.Height, n.BlockLatency, n.Online, n.IsValidator,n.Power,0,n.PrecommitSum))
 		}
 	}
 

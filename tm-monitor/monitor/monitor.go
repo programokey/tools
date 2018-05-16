@@ -84,6 +84,9 @@ func (m *Monitor) Monitor(n *Node) error {
 
 	blockCh := make(chan tmtypes.Header, 10)
 	n.SendBlocksTo(blockCh)
+	//添加
+	fullblockCh := make(chan tmtypes.Block,10)
+	n.SendFullBlocksTo(fullblockCh)
 	blockLatencyCh := make(chan float64, 10)
 	n.SendBlockLatenciesTo(blockLatencyCh)
 	disconnectCh := make(chan bool, 10)
@@ -96,7 +99,7 @@ func (m *Monitor) Monitor(n *Node) error {
 	m.Network.NewNode(n.Name)
 
 	m.nodeQuit[n.Name] = make(chan struct{})
-	go m.listen(n.Name, blockCh, blockLatencyCh, disconnectCh, m.nodeQuit[n.Name])
+	go m.listen(n.Name, blockCh,fullblockCh, blockLatencyCh, disconnectCh, m.nodeQuit[n.Name])
 
 	return nil
 }
@@ -150,7 +153,7 @@ func (m *Monitor) Stop() {
 }
 
 // main loop where we listen for events from the node
-func (m *Monitor) listen(nodeName string, blockCh <-chan tmtypes.Header, blockLatencyCh <-chan float64, disconnectCh <-chan bool, quit <-chan struct{}) {
+func (m *Monitor) listen(nodeName string, blockCh <-chan tmtypes.Header,  fullblockCh <-chan tmtypes.Block,blockLatencyCh <-chan float64, disconnectCh <-chan bool, quit <-chan struct{}) {
 	logger := m.logger.With("node", nodeName)
 
 	for {
@@ -160,6 +163,10 @@ func (m *Monitor) listen(nodeName string, blockCh <-chan tmtypes.Header, blockLa
 		case b := <-blockCh:
 			m.Network.NewBlock(b)
 			m.Network.NodeIsOnline(nodeName)
+		case fb := <-fullblockCh:
+
+			m.Network.NewFullBlock(fb)
+			//m.Network.NodeIsOnline(nodeName)
 		case l := <-blockLatencyCh:
 			m.Network.NewBlockLatency(l)
 			m.Network.NodeIsOnline(nodeName)
