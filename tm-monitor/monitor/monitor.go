@@ -44,28 +44,20 @@ type Monitor struct {
 
 // RPCNodeStatus returns statistics for the given node.
 func (m *Monitor) RPCNodeStatus(name string)( *NodeStatus ,error){
-	//return func(name string) (*monitor.Node, error) {
+
+		//if i, n := m.NodeByName(name); i != -1 {
+		//	fmt.Println("got",n.Name)
+		//}
+
+
+
 		if i, n := m.NodeByName(name); i != -1 {
-			fmt.Println("got",n.Name)
-		}
 
-
-	//for _, n := range m.Nodes {
-	//	fmt.Println(n.Name)
-	//}
-
-	return  &NodeStatus{name,true},nil
-
-	//return func() (*NodeStatus, error) {
-	//
-	//	if i, n := m.NodeByName(name); i != -1 {
-	//
-	//		return &NodeStatus{name,n.Online}, nil
-	//	}
-	//
-	//	return nil, errors.New("Cannot find node with that name")
-	//
-	//}
+			return &NodeStatus{name, n.Online}, nil
+		}else{
+			
+			return &NodeStatus{"unknown", false}, nil
+	}
 }
 
 
