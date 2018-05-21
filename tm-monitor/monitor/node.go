@@ -169,7 +169,7 @@ func newFullBlockCallback(n *Node) em.EventCallbackFunc {
 		pc := block.LastCommit.Precommits
 		voteNil := true
 		for _,commit:=range pc {
-			if pc != nil && commit != nil {
+			if pc != nil && commit != nil&& n.pubKey!= nil {
 				if n.pubKey.Address().String()==commit.ValidatorAddress.String() {
 					n.PrecommitSum ++
 					voteNil = false

@@ -14,6 +14,13 @@ import (
 // waiting more than this many seconds for a block means we're unhealthy
 const nodeLivenessTimeout = 5 * time.Second
 
+
+type NodeStatus struct{
+
+	Name string `json:"node_name"`
+	Status bool `json:"node_status"`
+}
+
 // Monitor keeps track of the nodes and updates common statistics upon
 // receiving new events from nodes.
 //
@@ -31,7 +38,36 @@ type Monitor struct {
 	numValidatorsUpdateInterval   time.Duration
 
 	logger log.Logger
+
+	//RPCNodeStatus(name string)(interface{},error)
 }
+
+// RPCNodeStatus returns statistics for the given node.
+func (m *Monitor) RPCNodeStatus(name string)( *NodeStatus ,error){
+	//return func(name string) (*monitor.Node, error) {
+		if i, n := m.NodeByName(name); i != -1 {
+			fmt.Println("got",n.Name)
+		}
+
+
+	//for _, n := range m.Nodes {
+	//	fmt.Println(n.Name)
+	//}
+
+	return  &NodeStatus{name,true},nil
+
+	//return func() (*NodeStatus, error) {
+	//
+	//	if i, n := m.NodeByName(name); i != -1 {
+	//
+	//		return &NodeStatus{name,n.Online}, nil
+	//	}
+	//
+	//	return nil, errors.New("Cannot find node with that name")
+	//
+	//}
+}
+
 
 // NewMonitor creates new instance of a Monitor. You can provide options to
 // change some default values.

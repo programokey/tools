@@ -6,7 +6,7 @@ import (
 
 	rpc "github.com/tendermint/tendermint/rpc/lib/server"
 	"github.com/tendermint/tmlibs/log"
-	monitor "github.com/kidinamoto01/tools/tm-monitor/monitor"
+	"github.com/kidinamoto01/tools/tm-monitor/monitor"
 )
 
 
@@ -28,11 +28,11 @@ func routes(m *monitor.Monitor) map[string]*rpc.RPCFunc {
 	return map[string]*rpc.RPCFunc{
 		"status":         rpc.NewRPCFunc(RPCStatus(m), ""),
 		"status/network": rpc.NewRPCFunc(RPCNetworkStatus(m), ""),
-		"status/node":    rpc.NewRPCFunc(RPCNodeStatus(m), "name"),
+		"status/node":    rpc.NewRPCFunc(m.RPCNodeStatus, "name"),
 		"monitor":        rpc.NewRPCFunc(RPCMonitor(m), "endpoint"),
 		"unmonitor":      rpc.NewRPCFunc(RPCUnmonitor(m), "endpoint"),
 
-		// "start_meter": rpc.NewRPCFunc(network.StartMeter, "chainID,valID,event"),
+		//"start_meter": rpc.NewRPCFunc(network.StartMeter, "chainID,valID,event"),
 		// "stop_meter":  rpc.NewRPCFunc(network.StopMeter, "chainID,valID,event"),
 		// "meter":       rpc.NewRPCFunc(GetMeterResult(network), "chainID,valID,event"),
 	}
@@ -40,27 +40,40 @@ func routes(m *monitor.Monitor) map[string]*rpc.RPCFunc {
 
 // RPCStatus returns common statistics for the network and statistics per node.
 func RPCStatus(m *monitor.Monitor) interface{} {
-	return func() (networkAndNodes, error) {
-		return networkAndNodes{m.Network, m.Nodes}, nil
+	return func() (*NetworkAndNodes, error) {
+
+		return &NetworkAndNodes{m.Network, m.Nodes}, nil
+
 	}
 }
 
 // RPCNetworkStatus returns common statistics for the network.
 func RPCNetworkStatus(m *monitor.Monitor) interface{} {
-	return func() (*monitor.Network, error) {
-		return m.Network, nil
+	return func() (*NetworkStatus, error) {
+		s := m.Network.GetHealthString()
+		return &NetworkStatus{s}, nil
 	}
 }
 
-// RPCNodeStatus returns statistics for the given node.
-func RPCNodeStatus(m *monitor.Monitor) interface{} {
-	return func(name string) (*monitor.Node, error) {
-		if i, n := m.NodeByName(name); i != -1 {
-			return n, nil
-		}
-		return nil, errors.New("Cannot find node with that name")
-	}
-}
+//// RPCNodeStatus returns statistics for the given node.
+//func (m *Monitor,) RPCNodeStatus(name string) interface{} {
+//	//return func(name string) (*monitor.Node, error) {
+//	//	if i, n := m.NodeByName(name); i != -1 {
+//	//		return n, nil
+//	//	}
+//	//	return nil, errors.New("Cannot find node with that name")
+//	//}
+//
+//	return func() (*NodeStatus, error) {
+//
+//		if i, n := m.NodeByName(name); i != -1 {
+//					return &NodeStatus{name,n.Online}, nil
+//		}
+//
+//		return nil, errors.New("Cannot find node with that name")
+//
+//	}
+//}
 
 // RPCMonitor allows to dynamically add a endpoint to under the monitor. Safe
 // to call multiple times.
@@ -121,7 +134,12 @@ func RPCUnmonitor(m *monitor.Monitor) interface{} {
 
 //--> types
 
-type networkAndNodes struct {
+type NetworkAndNodes struct {
 	Network *monitor.Network `json:"network"`
 	Nodes   []*monitor.Node  `json:"nodes"`
 }
+
+type NetworkStatus struct{
+	NStatus string `json:"network_status"`
+}
+

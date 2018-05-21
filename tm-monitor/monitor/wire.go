@@ -9,4 +9,6 @@ var cdc = amino.NewCodec()
 
 func init() {
 	ctypes.RegisterAmino(cdc)
+	cdc.RegisterConcrete(&NodeStatus{}, "tendermint/NodeStatus", nil)
+
 }

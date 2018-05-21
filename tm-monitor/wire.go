@@ -9,4 +9,5 @@ var cdc = amino.NewCodec()
 
 func init() {
 	ctypes.RegisterAmino(cdc)
+	//cdc.RegisterConcrete(&NetworkAndNodes{}, "monitor/NetworkAndNodes", nil)
 }
