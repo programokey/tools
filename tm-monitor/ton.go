@@ -6,7 +6,7 @@ import (
 	"os"
 	"text/tabwriter"
 	"time"
-	monitor "github.com/kidinamoto01/tools/tm-monitor/monitor"
+	monitor "github.com/programokey/tools/tm-monitor/monitor"
 )
 
 const (

@@ -6,7 +6,7 @@ import (
 
 	rpc "github.com/tendermint/tendermint/rpc/lib/server"
 	"github.com/tendermint/tmlibs/log"
-	"github.com/kidinamoto01/tools/tm-monitor/monitor"
+	"github.com/programokey/tools/tm-monitor/monitor"
 )
 
 

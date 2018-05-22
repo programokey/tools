@@ -8,7 +8,8 @@ import (
 
 	cmn "github.com/tendermint/tmlibs/common"
 	"github.com/tendermint/tmlibs/log"
-	"github.com/kidinamoto01/tools/tm-monitor/monitor"
+	"github.com/programokey/tools/tm-monitor/monitor"
+	"bytes"
 )
 
 var version = "0.4.0"
@@ -60,7 +61,14 @@ Examples:
 		logger = log.NewTMLogger(log.NewSyncWriter(os.Stdout))
 	}
 
-	m := startMonitor(flag.Arg(0))
+	var endpoints_buffer bytes.Buffer
+	for _, arg := range flag.Args(){
+		endpoints_buffer.WriteString(strings.TrimSpace(arg))
+	}
+
+	endpoints := endpoints_buffer.String()
+
+	m := startMonitor(endpoints)
 
 	startRPC(listenAddr, m, logger)
 

@@ -12,7 +12,9 @@ import (
 	tmtypes "github.com/tendermint/tendermint/types"
 	"github.com/tendermint/tmlibs/events"
 	"github.com/tendermint/tmlibs/log"
-	em "github.com/kidinamoto01/tools/tm-monitor/eventmeter"
+	em "github.com/programokey/tools/tm-monitor/eventmeter"
+	persistent "github.com/kidinamoto01/tools/tm-monitor/persistent"
+
 )
 
 const maxRestarts = 25
@@ -46,6 +48,8 @@ type Node struct {
 	blockLatencyCh chan<- float64
 	disconnectCh   chan<- bool
 
+	persistent 	*persistent.Persistent
+
 	checkIsValidatorInterval time.Duration
 
 	quit chan struct{}
@@ -75,6 +79,9 @@ func NewNodeWithEventMeterAndRpcClient(rpcAddr string, em eventMeter, rpcClient 
 		option(n)
 	}
 
+	n.persistent = persistent.NewPersistent("tm-monitor", "blockHeader")
+	n.persistent.Index([]string{"height"})
+	n.persistent.Index([]string{"time"})
 	return n
 }
 
@@ -125,6 +132,29 @@ func (n *Node) Start() error {
 	if err != nil {
 		return err
 	}
+
+	/*
+	EventQueryBond              = QueryForEvent(EventBond)
+	EventQueryUnbond            = QueryForEvent(EventUnbond)
+	EventQueryRebond            = QueryForEvent(EventRebond)
+	EventQueryDupeout           = QueryForEvent(EventDupeout)
+	EventQueryFork              = QueryForEvent(EventFork)
+	EventQueryNewBlock          types.EventDataNewBlock
+	EventQueryNewBlockHeader    types.EventDataNewBlockHeader
+	EventQueryNewRound          types.EventDataRoundState
+	EventQueryNewRoundStep      types.EventDataRoundState
+	EventQueryTimeoutPropose    types.EventDataRoundState
+	EventQueryCompleteProposal  types.EventDataRoundState
+	EventQueryPolka             types.EventDataRoundState
+	EventQueryUnlock            = QueryForEvent(EventUnlock)
+	EventQueryLock              = QueryForEvent(EventLock)
+	EventQueryRelock            = QueryForEvent(EventRelock)
+	EventQueryTimeoutWait       = QueryForEvent(EventTimeoutWait)
+	EventQueryVote              types.EventDataVote
+	EventQueryProposalHeartbeat types.EventDataProposalHeartbeat
+	EventQueryTx                types.EventDataTx
+	*/
+
 	n.em.RegisterDisconnectCallback(disconnectCallback(n))
 
 	n.Online = true
@@ -160,12 +190,18 @@ func newBlockCallback(n *Node) em.EventCallbackFunc {
 // implements eventmeter.EventCallbackFunc
 func newFullBlockCallback(n *Node) em.EventCallbackFunc {
 	return func(metric *em.EventMetric, data interface{}) {
+
 		block := data.(tmtypes.TMEventData).(tmtypes.EventDataNewBlock).Block
 
 		n.Height = block.Height
+		n.persistent.Save(block.Header)
 
 		n.logger.Info("new block", "height", block.Height, "hash", block.LastCommit.Hash())
 
+		// return nil if n isn't a validator
+		if n.pubKey == nil || !n.IsValidator{
+			return
+		}
 		pc := block.LastCommit.Precommits
 		voteNil := true
 		for _,commit:=range pc {
