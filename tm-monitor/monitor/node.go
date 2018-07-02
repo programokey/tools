@@ -79,7 +79,7 @@ func NewNodeWithEventMeterAndRpcClient(rpcAddr string, em eventMeter, rpcClient 
 		option(n)
 	}
 
-	n.persistent = persistent.NewPersistent("tm-monitor", "blockHeader")
+	n.persistent = persistent.NewPersistent("tm-monitor", "block")
 	n.persistent.Index([]string{"height"})
 	n.persistent.Index([]string{"time"})
 	return n
@@ -194,7 +194,7 @@ func newFullBlockCallback(n *Node) em.EventCallbackFunc {
 		block := data.(tmtypes.TMEventData).(tmtypes.EventDataNewBlock).Block
 
 		n.Height = block.Height
-		n.persistent.Save(block.Header)
+		n.persistent.Save(block)
 
 		n.logger.Info("new block", "height", block.Height, "hash", block.LastCommit.Hash())
 
