@@ -13,7 +13,7 @@ import (
 	"github.com/tendermint/tmlibs/events"
 	"github.com/tendermint/tmlibs/log"
 	em "github.com/programokey/tools/tm-monitor/eventmeter"
-	persistent "github.com/kidinamoto01/tools/tm-monitor/persistent"
+	persistent "github.com/programokey/tools/tm-monitor/persistent"
 
 )
 
@@ -122,12 +122,12 @@ func (n *Node) Start() error {
 	}
 
 	n.em.RegisterLatencyCallback(latencyCallback(n))
-	//添加full block的callback
+	//添加callback
 	err := n.em.Subscribe(tmtypes.EventQueryNewBlockHeader.String(), newBlockCallback(n))
 	if err != nil {
 		return err
 	}
-	//添加callback
+	//添加full block的callback
 	err = n.em.Subscribe(tmtypes.EventQueryNewBlock.String(), newFullBlockCallback(n))
 	if err != nil {
 		return err

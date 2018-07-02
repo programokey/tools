@@ -49,8 +49,6 @@ func (m *Monitor) RPCNodeStatus(name string)( *NodeStatus ,error){
 		//	fmt.Println("got",n.Name)
 		//}
 
-
-
 		if i, n := m.NodeByName(name); i != -1 {
 
 			return &NodeStatus{name, n.Online}, nil
