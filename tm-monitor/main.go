@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"os"
 	"strings"
@@ -9,7 +8,6 @@ import (
 	cmn "github.com/tendermint/tmlibs/common"
 	"github.com/tendermint/tmlibs/log"
 	"github.com/programokey/tools/tm-monitor/monitor"
-	"bytes"
 )
 
 var version = "0.4.0"
@@ -20,6 +18,7 @@ func main() {
 	var listenAddr string
 	var noton bool
 
+	/*
 	flag.StringVar(&listenAddr, "listen-addr", "tcp://0.0.0.0:46670", "HTTP and Websocket server listen address")
 	flag.BoolVar(&noton, "no-ton", false, "Do not show ton (table of nodes)")
 
@@ -46,7 +45,9 @@ Examples:
 		flag.Usage()
 		os.Exit(1)
 	}
-
+	*/
+	listenAddr = "tcp://0.0.0.0:46670"
+	noton = true
 	////第二个参数为no-ton
 	//b, err := strconv.ParseBool(flag.Arg(1))
 	//if err != nil{
@@ -61,13 +62,16 @@ Examples:
 		logger = log.NewTMLogger(log.NewSyncWriter(os.Stdout))
 	}
 
+	/*
 	var endpoints_buffer bytes.Buffer
+
 	for _, arg := range flag.Args(){
 		endpoints_buffer.WriteString(strings.TrimSpace(arg))
 	}
 
 	endpoints := endpoints_buffer.String()
-
+	 */
+	 endpoints := "54.215.221.213:46657"
 	m := startMonitor(endpoints)
 
 	startRPC(listenAddr, m, logger)

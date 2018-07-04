@@ -85,6 +85,15 @@
   revision = "c42d9e0ca023e2198120196f842701bb4c55d7b9"
 
 [[projects]]
+  name = "github.com/kidinamoto01/tools"
+  packages = [
+    "tm-monitor/mock",
+    "tm-monitor/monitor"
+  ]
+  revision = "f73b089e3fcfa9bc92ec347c004871b150f23c23"
+  version = "v1.0.0"
+
+[[projects]]
   branch = "master"
   name = "github.com/kr/logfmt"
   packages = ["."]
@@ -293,9 +302,21 @@
   revision = "5b3c4e850e90a4cf6a20ebd46c8b32a0a3afcb9e"
   version = "v1.7.5"
 
+[[projects]]
+  branch = "v2"
+  name = "gopkg.in/mgo.v2"
+  packages = [
+    ".",
+    "bson",
+    "internal/json",
+    "internal/sasl",
+    "internal/scram"
+  ]
+  revision = "3f83fa5005286a7fe593b055f0d7771a7dce4655"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "e2edfe12deb00d2afa1c7b76cf7ebe334784bcdb8636328761c3582f695108a9"
+  inputs-digest = "af02cb978970ad6868049ac921f36c69521e4f979a227e849dc367a514dcd246"
   solver-name = "gps-cdcl"
   solver-version = 1
